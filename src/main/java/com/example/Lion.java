@@ -1,10 +1,11 @@
+
 package com.example;
 
 import java.util.List;
 
-public class Lion {
+public class Lion extends Animal implements Predator {
 
-    boolean hasMane;
+    public boolean hasMane;
 
     public Lion(String sex) throws Exception {
         if ("Самец".equals(sex)) {
@@ -16,10 +17,14 @@ public class Lion {
         }
     }
 
-    Feline feline = new Feline();
-
+    @Override
     public int getKittens() {
-        return feline.getKittens();
+        return 1;
+    }
+
+    @Override
+    public int getKittens(int kittensCount) {
+        return kittensCount;
     }
 
     public boolean doesHaveMane() {
@@ -27,6 +32,12 @@ public class Lion {
     }
 
     public List<String> getFood() throws Exception {
-        return feline.getFood("Хищник");
+        return getFood("Хищник");
+    }
+
+    @Override
+    public List<String> eatMeat() throws Exception {
+        return getFood("Хищник");
+
     }
 }
