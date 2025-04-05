@@ -1,125 +1,88 @@
+import com.example.Feline;
 import com.example.Lion;
-import org.junit.Test;
-import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mock;
-import org.mockito.Spy;
+import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.Arrays;
 import java.util.List;
-
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
+
+@ExtendWith(MockitoExtension.class)
 public class LionTest {
 
-    @Spy
-    Lion lionSpy = new Lion("Самец");
-
     @Mock
-    Lion lionMock = mock(Lion.class);
+    private Feline felineMock;
 
-    public LionTest() throws Exception {
+    private Lion maleLion;
+    private Lion femaleLion;
+
+
+    @BeforeEach
+    void setUp() throws Exception {
+        maleLion = new Lion("Самец", felineMock);
+        femaleLion = new Lion("Самка", felineMock);
     }
 
-    //Тест на отсутствие ошибки при создании валидного объекта класса Lion
+
     @ParameterizedTest
     @ValueSource(strings = {"Самец", "Самка"})
     void lionConstructor_ValidSexDoesNotThrowException(String validSex) {
-        assertDoesNotThrow(() -> new Lion(validSex));
+        assertDoesNotThrow(() -> new Lion(validSex, felineMock));
     }
 
 
-    //Тест на ошибку при создании невалидного объекта класса Lion
     @ParameterizedTest
     @ValueSource(strings = {"Львенок", "", "Львица"})
     void lionConstructor_InvalidSexThrowsException(String invalidSex) {
         Exception exception = assertThrows(
                 Exception.class,
-                () -> new Lion(invalidSex),
+                () -> new Lion(invalidSex, felineMock),
                 "Для пола '" + invalidSex + "' должно быть исключение"
         );
 
         assertEquals(
-                "Используйте допустимые значения пола животного - самей или самка",
+                "Используйте допустимые значения пола животного - самец или самка",
                 exception.getMessage()
         );
     }
 
-
-
-    //Далее будут тест на проверку методов
     @Test
-    public void getKittens_ShouldCallMethodWithoutArguments() {
-        lionMock.getKittens();
-        verify(lionMock).getKittens();
+    public void getKittens_ShouldReturnOneKitten() throws Exception {
+        when(felineMock.getKittens()).thenReturn(1);
+        assertEquals(1, femaleLion.getKittens());
     }
 
 
     @Test
-    public void getKittens_ShouldReturn1() {
-        boolean isCorrectReturnValue = lionSpy.getKittens() == 1;
-        Assertions.assertTrue(isCorrectReturnValue, "Вернулось значение " + lionSpy.getKittens() + " вместо 1");
-    }
-
-    @Test
-    public void getKittens_ShouldCallMethodWithArguments() {
-        lionMock.getKittens(3);
-        verify(lionMock).getKittens(3);
-    }
-
-    @Test
-    public void getKittens_ShouldReturnKittensCount() {
-        boolean isCorrectReturnValue = lionSpy.getKittens(3) == 3;
-        Assertions.assertTrue(isCorrectReturnValue, "Вернулось значение " + lionSpy.getKittens(3) + " вместо 3");
+    public void getKittens_ShouldReturnKittensCount() throws Exception {
+        when(felineMock.getKittens(3)).thenReturn(3);
+        assertEquals(3, femaleLion.getKittens(3));
     }
 
 
     @Test
-    public void doesHaveMane_ReturnTrueIfLionIsMail() throws Exception {
-        Lion lion = new Lion("Самец");
-        Assertions.assertTrue(lion.doesHaveMane(), "Должно вернуться значение 'Самец' вместо " + lion.doesHaveMane());
+    public void doesHaveMane_ReturnTrueIfLionIsMale() {
+        assertTrue(maleLion.doesHaveMane());
     }
 
 
     @Test
-    public void doesHaveMane_ReturnFalseIfLionIsFemail() throws Exception {
-        Lion lion = new Lion("Самка");
-        Assertions.assertFalse(lion.doesHaveMane(), "Должно вернуться значение 'Самка' вместо " + lion.doesHaveMane());
+    public void doesHaveMane_ReturnFalseIfLionIsFemale() {
+        assertFalse(femaleLion.doesHaveMane());
     }
 
 
     @Test
-    public void getFood_ShouldCallMethod() throws Exception {
-        lionMock.getFood("Хищник");
-        verify(lionMock).getFood("Хищник");
-    }
-
-
-    @Test
-    public void getFood_ShouldReturnListOfFelineFood() throws Exception {
-        List<String> expectedResult = lionSpy.getFood();
-        List<String> actualResult = Arrays.asList("Животные", "Птицы", "Рыба");
-        boolean isEqualIgnoreOrder = expectedResult.size() == actualResult.size()
-                && expectedResult.containsAll(actualResult);
-        Assertions.assertTrue(isEqualIgnoreOrder, "Вернулся список: " + actualResult + " вместо " + expectedResult);
-    }
-
-
-    @Test
-    public void eatMeat_ShouldCallMethod() throws Exception {
-        lionMock.eatMeat();
-        verify(lionMock).eatMeat();
-    }
-
-
-    @Test
-    public void eatMeat_ShouldReturnListOfFelineFood() throws Exception {
-        List<String> expectedResult = lionSpy.eatMeat();
-        List<String> actualResult = Arrays.asList("Животные", "Птицы", "Рыба");
-        boolean isEqualIgnoreOrder = expectedResult.size() == actualResult.size()
-                && expectedResult.containsAll(actualResult);
-        Assertions.assertTrue(isEqualIgnoreOrder, "Вернулся список: " + actualResult + " вместо " + expectedResult);
+    public void getFood_ShouldReturnListOfFood() throws Exception {
+        List<String> expectedFoodList = Arrays.asList("Животные", "Птицы", "Рыба");
+        when(felineMock.getFood("Хищник")).thenReturn(expectedFoodList);
+        List<String> actualFoodList = maleLion.getFood();
+        assertEquals(expectedFoodList, actualFoodList);
     }
 }
